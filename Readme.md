@@ -1,4 +1,4 @@
-###Expected output from main.js
+### Expected output from main.js
 
 **Step 1**
 **Author: Create author**
