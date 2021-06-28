@@ -1,0 +1,7 @@
+# Folders
+node_modules/
+offTangleComs/*
+weakhold/*
+
+# exception to the rule
+!offTangleComs/README.md
