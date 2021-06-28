@@ -91,15 +91,6 @@ async function fetchNewMessages(author) {
 }
 
 
-async function syncState(author) {
-  console.log('\x1b[36m%s\x1b[0m', 'Author: Synchronize channel state');
-  
-  await author.clone().sync_state();
-  
-  console.log('State syncronized successfully')
-}
-
-
 exports.createAuthor = createAuthor;
 exports.announceChannel = announceChannel;
 exports.receiveSubscription = receiveSubscription;
