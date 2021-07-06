@@ -95,4 +95,3 @@ exports.createAuthor = createAuthor;
 exports.announceChannel = announceChannel;
 exports.receiveSubscription = receiveSubscription;
 exports.fetchNewMessages = fetchNewMessages;
-exports.syncState = syncState;
