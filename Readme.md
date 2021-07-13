@@ -1,4 +1,4 @@
-#### Output from running main.js should look something like this:
+#### Output from running main.js should look similar to this:
 
 ```
 Step 1
