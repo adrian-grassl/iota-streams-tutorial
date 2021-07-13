@@ -1,9 +1,9 @@
 // Copyright 2020-2021 IOTA Stiftung
 // SPDX-License-Identifier: Apache-2.0
 
-const streams = require("@jmcanterafonseca-iota/iota_streams_wasm");
+const streams = require("C:/Git/streams/bindings/wasm/wasm-node/iota_streams_wasm");
 const fetch = require("node-fetch");
-const { createSeed, from_bytes } = require('./helpers');
+const { createSeed, from_bytes, getExplorerUrl } = require('./helpers');
 const { readFileSync, writeFileSync } = require('fs');
 
 global.fetch = fetch;
@@ -18,9 +18,9 @@ let node = "https://chrysalis-nodes.iota.org/";
 let options = new streams.SendOptions(node, 9, true, 1);
 
 async function createAuthor() {
-  console.log('\x1b[36m%s\x1b[0m', 'Author: Create author');
+  console.log('\x1b[36m%s\x1b[0m', 'Author: Create author and new channel');
 
-// Create author with new seed
+  // Create author with new seed
   let authorSeed = createSeed();
   let author = new streams.Author(authorSeed, options.clone(), false);
   
@@ -33,13 +33,16 @@ async function createAuthor() {
 
 
 async function announceChannel(author) {
-  console.log('\x1b[36m%s\x1b[0m', 'Author: Create channel');
+  console.log('\x1b[36m%s\x1b[0m', 'Author: Send announcement');
 
   // Announce new channel
   let response = await author.clone().send_announce();
   let announcementLink = response.get_link();
+  console.log("Announcement link: ", announcementLink.to_string());
 
-  console.log("Announcement at: ", announcementLink.to_string());
+  //Fetch message details
+  let announcementMessageDetails = await author.clone().get_client().get_link_details(announcementLink.copy());
+  console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", announcementMessageDetails.get_metadata().message_id));
 
   // Write announcement link to off-Tangle link exchange
   writeFileSync('./offTangleComs/1_announcement.txt', announcementLink.to_string());
@@ -61,8 +64,11 @@ async function receiveSubscription(author) {
   // Send keyload message
   response = await author.clone().send_keyload_for_everyone(announcementLink);
   let keyloadLink = response.get_link();
+  console.log("Keyload link: ", keyloadLink.to_string());
 
-  console.log("Keyload at: ", keyloadLink.to_string());
+  //Fetch message details
+  let keyloadMessageDetails = await author.clone().get_client().get_link_details(keyloadLink.copy());
+  console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", keyloadMessageDetails.get_metadata().message_id));
 
   // Write keyload link to off-Tangle link exchange
   writeFileSync('./offTangleComs/3_keyload.txt', keyloadLink.to_string());
@@ -71,7 +77,7 @@ async function receiveSubscription(author) {
 
 async function fetchNewMessages(author) {
   console.log('\x1b[36m%s\x1b[0m', 'Author: Fetch new messages from channel');
-
+  
   // Fetch new messages
   let exists = true;
   while (exists) {
@@ -82,7 +88,13 @@ async function fetchNewMessages(author) {
     }
 
     for (var i = 0; i < responses.length; i++) {
+      const messageLink = responses[i].get_link();
       console.log("Message link:",      responses[i].get_link().to_string());
+
+      //Fetch message details
+      let messageDetails = await author.clone().get_client().get_link_details(messageLink.copy());
+      console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", messageDetails.get_metadata().message_id));
+
       console.log("Public payload: ",   from_bytes(responses[i].get_message().get_public_payload()));
       console.log("Masked payload: ",   from_bytes(responses[i].get_message().get_masked_payload()));
       console.log("\n");

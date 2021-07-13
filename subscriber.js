@@ -1,9 +1,9 @@
 // Copyright 2020-2021 IOTA Stiftung
 // SPDX-License-Identifier: Apache-2.0
 
-const streams = require("@jmcanterafonseca-iota/iota_streams_wasm");
+const streams = require("C:/Git/streams/bindings/wasm/wasm-node/iota_streams_wasm");
 const fetch = require("node-fetch");
-const { createSeed, to_bytes } = require('./helpers');
+const { createSeed, to_bytes, getExplorerUrl } = require('./helpers');
 const { readFileSync, writeFileSync } = require('fs');
 
 global.fetch = fetch;
@@ -41,8 +41,11 @@ async function subscribeChannel(subscriber) {
     // Send subscription
     let response = await subscriber.clone().send_subscribe(announcementLink);
     let subscriptionLink = response.get_link();
+    console.log("Subscription link: ", subscriptionLink.to_string());
 
-    console.log("Subscription at: ", subscriptionLink.to_string());
+    //Fetch message details
+    let subscriptionMessageDetails = await subscriber.clone().get_client().get_link_details(subscriptionLink.copy());
+    console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", subscriptionMessageDetails.get_metadata().message_id));
 
     // Write subscription link to off-Tangle link exchange
     writeFileSync('./offTangleComs/2_subscription.txt', subscriptionLink.to_string());
@@ -68,8 +71,11 @@ async function sendTaggedPacket(subscriber) {
       .clone()
       .send_tagged_packet(keyloadLink, publicPayload, maskedPayload);
     let taggedPacketLink = response.get_link();
+    console.log("Tagged packet link: ", taggedPacketLink.to_string());
 
-    console.log("Tagged packet at: ", taggedPacketLink.to_string());
+    //Fetch message details
+    let taggedPacketMessageDetails = await subscriber.clone().get_client().get_link_details(taggedPacketLink.copy());
+    console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", taggedPacketMessageDetails.get_metadata().message_id));
 
     // Write last message link to off-Tangle link exchange
     writeFileSync('./offTangleComs/4_lastLink.txt', taggedPacketLink.to_string());
@@ -97,7 +103,12 @@ async function sendMultipleSignedPackets(subscriber) {
         .clone()
         .send_signed_packet(lastLink, publicPayload, maskedPayload);
         lastLink = response.get_link();
-      console.log(`Signed packet #${x} at: `, lastLink.to_string());
+      console.log(`Signed packet #${x} link: `, lastLink.to_string());
+
+      //Fetch message details
+      let signedPacketMessageDetails = await subscriber.clone().get_client().get_link_details(lastLink.copy());
+      console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", signedPacketMessageDetails.get_metadata().message_id));
+      console.log("\n");
     }
 
     // Write last message link to off-Tangle link exchange

@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@jmcanterafonseca-iota/iota_streams_wasm": "0.0.1",
+    "iota-streams-wasm": "^1.0.4",
     "node-fetch": "^2.6.1"
   }
 }

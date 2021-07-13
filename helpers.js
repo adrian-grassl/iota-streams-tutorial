@@ -28,6 +28,12 @@ function from_bytes(bytes) {
 }
 
 
+function getExplorerUrl(network, messageId) {
+  return(`https://explorer.iota.org/${network}/message/${messageId}`);
+}
+
+
 exports.createSeed = createSeed;
 exports.to_bytes = to_bytes;
 exports.from_bytes = from_bytes;
+exports.getExplorerUrl = getExplorerUrl;

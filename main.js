@@ -46,7 +46,6 @@ async function main() {
     await subscriber.sendMultipleSignedPackets(subscriberInstance.clone());
 
     // Step 9: Fetch new messages
-    console.log('\n');
     console.log('\x1b[36m%s\x1b[0m', 'Step 9');
     await author.fetchNewMessages(authorInstance.clone());
 }
