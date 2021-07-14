@@ -1,7 +1,7 @@
 // Copyright 2020-2021 IOTA Stiftung
 // SPDX-License-Identifier: Apache-2.0
 
-const streams = require("C:/Git/streams/bindings/wasm/wasm-node/iota_streams_wasm");
+const streams = require("@iota/streams-wasm/node");
 const fetch = require("node-fetch");
 const { createSeed, to_bytes, getExplorerUrl } = require('./helpers');
 const { readFileSync, writeFileSync } = require('fs');
