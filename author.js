@@ -1,7 +1,7 @@
 // Copyright 2020-2021 IOTA Stiftung
 // SPDX-License-Identifier: Apache-2.0
 
-const streams = require("@iota/streams-wasm/node");
+const streams = require("@iota/streams/node");
 const fetch = require("node-fetch");
 const { createSeed, from_bytes, getExplorerUrl } = require('./helpers');
 const { readFileSync, writeFileSync } = require('fs');
@@ -37,15 +37,15 @@ async function announceChannel(author) {
 
   // Announce new channel
   let response = await author.clone().send_announce();
-  let announcementLink = response.get_link();
-  console.log("Announcement link: ", announcementLink.to_string());
+  let announcementLink = response.link;
+  console.log("Announcement link: ", announcementLink.toString());
 
   //Fetch message details
   let announcementMessageDetails = await author.clone().get_client().get_link_details(announcementLink.copy());
   console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", announcementMessageDetails.get_metadata().message_id));
 
   // Write announcement link to off-Tangle link exchange
-  writeFileSync('./offTangleComs/1_announcement.txt', announcementLink.to_string());
+  writeFileSync('./offTangleComs/1_announcement.txt', announcementLink.toString());
 }
 
 
@@ -54,24 +54,24 @@ async function receiveSubscription(author) {
 
   // Receive subscription
   let subscriptionLinkString = readFileSync('./offTangleComs/2_subscription.txt', 'utf8');
-  let subscriptionLink = streams.Address.from_string(subscriptionLinkString);
+  let subscriptionLink = streams.Address.parse(subscriptionLinkString);
   await author.clone().receive_subscribe(subscriptionLink.copy());
 
   // Read announcement message
   let announcementLinkString = readFileSync('./offTangleComs/1_announcement.txt', 'utf8');
-  let announcementLink = streams.Address.from_string(announcementLinkString);
+  let announcementLink = streams.Address.parse(announcementLinkString);
 
   // Send keyload message
   response = await author.clone().send_keyload_for_everyone(announcementLink);
-  let keyloadLink = response.get_link();
-  console.log("Keyload link: ", keyloadLink.to_string());
+  let keyloadLink = response.link;
+  console.log("Keyload link: ", keyloadLink.toString());
 
   //Fetch message details
   let keyloadMessageDetails = await author.clone().get_client().get_link_details(keyloadLink.copy());
   console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", keyloadMessageDetails.get_metadata().message_id));
 
   // Write keyload link to off-Tangle link exchange
-  writeFileSync('./offTangleComs/3_keyload.txt', keyloadLink.to_string());
+  writeFileSync('./offTangleComs/3_keyload.txt', keyloadLink.toString());
 }
 
 
@@ -88,15 +88,15 @@ async function fetchNewMessages(author) {
     }
 
     for (var i = 0; i < responses.length; i++) {
-      const messageLink = responses[i].get_link();
-      console.log("Message link:",      responses[i].get_link().to_string());
+      const messageLink = responses[i].link;
+      console.log("Message link:",      responses[i].link.toString());
 
       //Fetch message details
       let messageDetails = await author.clone().get_client().get_link_details(messageLink.copy());
       console.log('\x1b[34m%s\x1b[0m', getExplorerUrl("mainnet", messageDetails.get_metadata().message_id));
 
-      console.log("Public payload: ",   from_bytes(responses[i].get_message().get_public_payload()));
-      console.log("Masked payload: ",   from_bytes(responses[i].get_message().get_masked_payload()));
+      console.log("Public payload: ",   from_bytes(responses[i].message.get_public_payload()));
+      console.log("Masked payload: ",   from_bytes(responses[i].message.get_masked_payload()));
       console.log("\n");
     }
   }
