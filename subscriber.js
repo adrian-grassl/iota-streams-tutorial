@@ -2,14 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 const streams = require("@iota/streams/node");
-const fetch = require("node-fetch");
 const { createSeed, to_bytes, getExplorerUrl } = require('./helpers');
 const { readFileSync, writeFileSync } = require('fs');
 
-global.fetch = fetch;
-global.Headers = fetch.Headers;
-global.Request = fetch.Request;
-global.Response = fetch.Response;
 
 streams.set_panic_hook();
 
